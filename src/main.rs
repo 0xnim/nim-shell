@@ -34,20 +34,32 @@ fn main() {
     }
 }
 
-fn check_command(command: &Command) -> bool {
-    match command.name.as_str() {
-        "exit" => true,
-        "echo" => true,
-        _ => false,
-    }
-}
-
 fn run_command(command: &Command) {
     match command.name.as_str() {
         "exit" => std::process::exit(0),
         "echo" => println!("{}", command.args.join(" ")),
+        "type" => {
+            if check_builtin(command.args[0].as_str()) {
+                println!("{} is a shell builtin", command.args[0]);
+            } else {
+                println!("{} not found", command.args[0]);
+            }
+        }
         _ => {}
     }
+}
+
+fn check_builtin(input: &str) -> bool {
+    match input.trim() {
+        "exit" => true,
+        "echo" => true,
+        "type" => true,
+        _ => false,
+    }
+}
+
+fn check_command(command: &Command) -> bool {
+    check_builtin(command.name.as_str())
 }
 
 // struct for command
