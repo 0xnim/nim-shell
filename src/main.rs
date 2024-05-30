@@ -14,12 +14,44 @@ fn main() {
         let stdin = io::stdin();
         let mut input = String::new();
         stdin.read_line(&mut input).unwrap();
-        match input.trim() {
-            "exit 0" => break,
-            _ => {}
+        // put into into struct
+        let command = Command {
+            // name is the first word
+            name: input.trim().split_whitespace().next().unwrap().to_string(),
+            // args are the rest of the words
+            args: input
+                .trim()
+                .split_whitespace()
+                .skip(1)
+                .map(|s| s.to_string())
+                .collect(),
+        };
+        if check_command(&command) {
+            run_command(&command);
+        } else {
+            println!("{}: command not found", input.trim());
         }
-        println!("{}: command not found", input.trim());
-
-        // case exit, exit
     }
+}
+
+fn check_command(command: &Command) -> bool {
+    match command.name.as_str() {
+        "exit" => true,
+        "echo" => true,
+        _ => false,
+    }
+}
+
+fn run_command(command: &Command) {
+    match command.name.as_str() {
+        "exit" => std::process::exit(0),
+        "echo" => println!("{}", command.args.join(" ")),
+        _ => {}
+    }
+}
+
+// struct for command
+struct Command {
+    name: String,
+    args: Vec<String>,
 }
