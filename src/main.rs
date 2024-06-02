@@ -73,12 +73,14 @@ fn run_command(command: &Command) {
                     if std::path::Path::new(&path).is_dir() {
                         if command.args.len() == 0 {
                             std::env::set_current_dir(std::env::var("HOME").unwrap()).unwrap();
+                        } else if command.args[0] == "~" {
+                            std::env::set_current_dir(std::env::var("HOME").unwrap()).unwrap();
                         } else if command.args[0].starts_with("/") {
                             std::env::set_current_dir(command.args[0].as_str()).unwrap();
                         } else if command.args[0].starts_with(".") {
                             std::env::set_current_dir(command.args[0].as_str()).unwrap();
                         } else {
-                            println!("{}: No such file or directory", command.args[0]);
+                            println!("{}: No such file or directory1", command.args[0]);
                         }
                     } else {
                         println!("{}: No such dir", command.args[0]);
@@ -141,6 +143,8 @@ fn check_path(input: &str) -> Option<String> {
 
     if std::path::Path::new(input).exists() {
         return Some(input.to_string());
+    } else if input == "~" {
+        return Some(std::env::var("HOME").unwrap());
     }
     None
 }
