@@ -66,10 +66,27 @@ fn run_command(command: &Command) {
         },
         "pwd" => println!("{}", std::env::current_dir().unwrap().display()),
         "cd" => {
-            if command.args.len() == 0 {
-                std::env::set_current_dir(std::env::var("HOME").unwrap()).unwrap();
-            } else {
-                std::env::set_current_dir(command.args[0].as_str()).unwrap();
+            // check if the path is a dir or file
+
+            match check_path(command.args[0].as_str()) {
+                Some(path) => {
+                    if std::path::Path::new(&path).is_dir() {
+                        if command.args.len() == 0 {
+                            std::env::set_current_dir(std::env::var("HOME").unwrap()).unwrap();
+                        } else if command.args[0].starts_with("/") {
+                            std::env::set_current_dir(command.args[0].as_str()).unwrap();
+                        } else if command.args[0].starts_with(".") {
+                            std::env::set_current_dir(command.args[0].as_str()).unwrap();
+                        } else {
+                            println!("{}: No such file or directory", command.args[0]);
+                        }
+                    } else {
+                        println!("{}: No such dir", command.args[0]);
+                    }
+                }
+                None => {
+                    println!("{}: No such file or directory", command.args[0]);
+                }
             }
         }
         _ => {
